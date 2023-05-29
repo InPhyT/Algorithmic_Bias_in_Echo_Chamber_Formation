@@ -1,0 +1,733 @@
+---
+title: "ABM-MAS Project<br>"
+subtitle: '<em>Algorithmic Bias in<br> Echo Chamber Formation</em> <br><br>'
+#author: 'Pietro Monticone | [`r icon::fa("at")`](pietro.monticone@edu.unito.it) [`r icon::fa("github")`](https://github.com/pitmonticone) [`r icon::fa("twitter")`](https://twitter.com/PietroMonticone)<br>Claudio Moroni &nbsp;&nbsp;&nbsp;| [`r icon::fa("at")`](claudio.moroni@edu.unito.it) [`r icon::fa("github")`](https://github.com/claudio20497) [`r icon::fa("twitter")`](https://twitter.com/ClaudioMoroni5)<br>Davide Orsenigo &nbsp;| [`r icon::fa("at")`](davide.orsenigo@edu.unito.it) [`r icon::fa("github")`](https://github.com/daorse) [`r icon::fa("twitter")`](https://twitter.com/DavideOrsenigo)<br>Riccardo Roma &nbsp;&nbsp;&nbsp;| [`r icon::fa("at")`](riccardo.roma@edu.unito.it) [`r icon::fa("github")`](https://github.com/) [`r icon::fa("twitter")`](https://twitter.com/)<br><br>'
+date: "`r Sys.Date()` | *University of Turin*"
+#geometry: margin = 0.1cm
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: xaringan-themer.css
+    nature:
+      highlightStyle: tomorrow-night-bright
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE, include = FALSE, eval = FALSE) 
+library(DT)
+library(knitr)
+library(tidyverse)
+```
+
+name: overview
+class: center 
+
+# Overview 
+
+.left[
+**Goal**: to assess the impact of the recommendation algorithm on Twitter echo chambers.
+
+#### 1. [*Definitions*](#definitions)
+
+#### 2. [*Data*](#data)
+
+#### 3. [*Model*](#model)
+
+#### 4. [*Exploratory Data Analysis*](#exploratory-data-analysis)
+
+#### 5. [*Future Developments*](#future)
+]
+
+.footnote[
+.left[.small[For further details, please read the [report](https://inphyt.github.io/ABM_MAS/Report/report.html).]]]
+
+---
+name: definitions
+class: center 
+## Definitions
+
+.left[
+### Recommendation algorithm
+A parametric feed-ranking system which is said to be
+
+* *free* if completely determined by the follower graph topology and users activity chronology;
+* *biased* otherwise.]
+
+.left[
+### Echo Chamber 
+Let's consider a metagraph $G$, a measure of node attribute homogeneity $\xi:2^G \to \mathbb{R}$ and a clustering algorithm $\mathcal{C}$. 
+We define a $(\mathcal{C}, p)$-*echo chamber* as a subgraph $H \subseteq G$ such that
+1. $H$ is a $\mathcal{C}$-cluster.
+2. $\xi(H) \geq p$. 
+]
+
+---
+name: data
+class: center 
+# Data 
+
+.left[ 
+### 2012 collection
+1. **Tweets mining**: all relevant tweet objects from 2012 data.
+
+2. **Hashtag-based users mining**: U.S. election related hashtags have been searched and the users who adopted them selected. 
+
+3. **Subscription-based users mining**: the set $X$ of users who survived from 2012 to 2020 has been considered ( $\sim 100,000$ ).
+
+### 2020 collection
+
+1. **Interaction network scraping**: user timeline-aggregated interaction network has been extracted $\forall x \in X$ in order to filter the subset $Y \subset X$ of those who are still active and sufficiently connected ( $\sim 10,000$ ).
+
+2. **Users activity monitoring**: A detailed temporal activity monitoring pipeline has been launched $\forall y \in Y$.
+
+]
+
+---
+name: exploratory-data-analysis
+class: center 
+
+# Exploratory Data Analysis
+
+.footnote[
+.left[.small[For further details, please read the [report](https://inphyt.github.io/ABM_MAS/Report/report.html).]]]
+
+---
+name: tweet-dynamics
+class: center 
+
+## Tweet Dynamics: *X vs. Y*
+
+.pull-left[
+### Year
+
+![](figures/monitored_users_2012_AT_activity_160000/aggregated_tweets_daily.png)
+
+![](figures/monitored_users_2012_AT_activity_10000/aggregated_tweets_daily.png)
+
+![](figures/monitored_users_2012_AT_activity_160000/aggregated_tweets_cumulated.png)
+
+![](figures/monitored_users_2012_AT_activity_10000/aggregated_tweets_cumulated.png)
+]
+
+.pull-right[
+### Election Period
+![](figures/monitored_users_2012_AT_activity_election_period_160000/aggregated_tweets_daily.png)
+
+![](figures/monitored_users_2012_AT_activity_election_period_10000/aggregated_tweets_daily.png)
+
+![](figures/monitored_users_2012_AT_activity_election_period_160000/aggregated_tweets_cumulated.png)
+
+![](figures/monitored_users_2012_AT_activity_election_period_10000/aggregated_tweets_cumulated.png)
+
+]
+
+---
+name: retweet-dynamics
+class: center 
+
+## Retweet Dynamics: *X vs. Y*
+
+
+.pull-left[
+### Year
+
+![](figures/monitored_users_2012_AT_activity_160000/aggregated_retweets_daily.png)
+
+![](figures/monitored_users_2012_AT_activity_10000/aggregated_retweets_daily.png)
+
+![](figures/monitored_users_2012_AT_activity_160000/aggregated_retweets_cumulated.png)
+
+![](figures/monitored_users_2012_AT_activity_10000/aggregated_retweets_cumulated.png)
+]
+
+.pull-right[
+### Election Period
+![](figures/monitored_users_2012_AT_activity_election_period_160000/aggregated_retweets_daily.png)
+
+![](figures/monitored_users_2012_AT_activity_election_period_10000/aggregated_retweets_daily.png)
+
+![](figures/monitored_users_2012_AT_activity_election_period_160000/aggregated_retweets_cumulated.png)
+
+![](figures/monitored_users_2012_AT_activity_election_period_10000/aggregated_retweets_cumulated.png)
+
+]
+---
+name: hashtag-dynamics
+class: center 
+
+## Hashtag Dynamics: *X vs. Y*
+
+
+.pull-left[
+### Year
+
+![](figures/monitored_users_2012_AT_activity_160000/aggregated_hashtags_daily.png)
+
+![](figures/monitored_users_2012_AT_activity_10000/aggregated_hashtags_daily.png)
+
+![](figures/monitored_users_2012_AT_activity_160000/aggregated_hashtags_cumulated.png)
+
+![](figures/monitored_users_2012_AT_activity_10000/aggregated_hashtags_cumulated.png)
+]
+
+.pull-right[
+### Election Period
+![](figures/monitored_users_2012_AT_activity_election_period_160000/aggregated_hashtags_daily.png)
+
+![](figures/monitored_users_2012_AT_activity_election_period_10000/aggregated_hashtags_daily.png)
+
+![](figures/monitored_users_2012_AT_activity_election_period_160000/aggregated_hashtags_cumulated.png)
+
+![](figures/monitored_users_2012_AT_activity_election_period_10000/aggregated_hashtags_cumulated.png)
+
+]
+---
+name: activity-ensemblesx
+class: center 
+
+## Activity Ensembles: *X*
+
+.pull-left[
+### Year
+![](figures/monitored_users_2012_AT_activity_160000/ensemble.png)
+]
+
+.pull-right[
+### Election Period
+![](figures/monitored_users_2012_AT_activity_election_period_160000/ensemble.png)
+]
+
+.footnote[
+.left[.small[For further details, please read the [report](https://inphyt.github.io/ABM_MAS/Report/report.html).]]]
+
+---
+name: activity-ensemblesy
+class: center 
+
+## Activity Ensembles: *Y*
+
+.pull-left[
+### Year
+![](figures/monitored_users_2012_AT_activity_10000/ensemble.png)
+]
+
+.pull-right[
+### Election Period
+![](figures/monitored_users_2012_AT_activity_election_period_10000/ensemble.png)
+]
+
+.footnote[
+.left[.small[For further details, please read the [report](https://inphyt.github.io/ABM_MAS/Report/report.html).]]]
+
+---
+name: favorite-activity
+class: center 
+
+## Favorite Activity: *X vs. Y*
+
+.pull-left[
+### Year
+![](figures/monitored_users_2012_AT_activity_160000/favourite_activity_rounded.png)
+![](figures/monitored_users_2012_AT_activity_10000/favourite_activity_rounded.png)
+
+]
+
+.pull-right[
+### Election Period
+![](figures/monitored_users_2012_AT_activity_election_period_160000/favourite_activity_rounded.png)
+![](figures/monitored_users_2012_AT_activity_election_period_10000/favourite_activity_rounded.png)
+
+]
+
+.footnote[
+.left[.small[For further details, please read the [report](https://inphyt.github.io/ABM_MAS/Report/report.html).]]]
+
+---
+name: hashtag-activity
+class: center 
+
+## Hashtag Activity: *X vs. Y*
+
+.pull-left[
+### Year
+![](figures/monitored_users_2012_AT_activity_160000/hashtags_activity_rounded.png)
+![](figures/monitored_users_2012_AT_activity_10000/hashtags_activity_rounded.png)
+
+]
+
+.pull-right[
+### Election Period
+![](figures/monitored_users_2012_AT_activity_election_period_160000/hashtags_activity_rounded.png)
+![](figures/monitored_users_2012_AT_activity_election_period_10000/hashtags_activity_rounded.png)
+
+]
+
+.footnote[
+.left[.small[For further details, please read the [report](https://inphyt.github.io/ABM_MAS/Report/report.html).]]]
+---
+name: friend-activity
+class: center 
+
+## Friend Activity: *X vs. Y*
+
+.pull-left[
+### Year
+![](figures/monitored_users_2012_AT_activity_160000/friend_activity_rounded.png)
+![](figures/monitored_users_2012_AT_activity_10000/friend_activity_rounded.png)
+
+]
+
+.pull-right[
+### Election Period
+![](figures/monitored_users_2012_AT_activity_election_period_160000/friend_activity_rounded.png)
+![](figures/monitored_users_2012_AT_activity_election_period_10000/friend_activity_rounded.png)
+]
+.footnote[
+.left[.small[For further details, please read the [report](https://inphyt.github.io/ABM_MAS/Report/report.html).]]]
+
+---
+name: friend-activity
+class: center 
+
+## Mention Activity: *X vs. Y*
+
+.pull-left[
+### Year
+![](figures/monitored_users_2012_AT_activity_160000/mention_activity_rounded.png)
+![](figures/monitored_users_2012_AT_activity_10000/mention_activity_rounded.png)
+
+]
+
+.pull-right[
+### Election Period
+![](figures/monitored_users_2012_AT_activity_election_period_160000/mention_activity_rounded.png)
+![](figures/monitored_users_2012_AT_activity_election_period_10000/mention_activity_rounded.png)
+]
+.footnote[
+.left[.small[For further details, please read the [report](https://inphyt.github.io/ABM_MAS/Report/report.html).]]]
+
+---
+name: hashtag-frequency
+class: center 
+
+## Hashtag Frequency: *X vs. Y*
+
+.pull-left[
+### Year
+![](figures/monitored_users_2012_AT_activity_160000/mean_hashtags_frequency_rounded.png)
+![](figures/monitored_users_2012_AT_activity_10000/mean_hashtags_frequency_rounded.png)
+
+]
+
+.pull-right[
+### Election Period
+![](figures/monitored_users_2012_AT_activity_election_period_160000/mean_hashtags_frequency_rounded.png)
+![](figures/monitored_users_2012_AT_activity_election_period_10000/mean_hashtags_frequency_rounded.png)
+]
+
+---
+name: hashtag-heterogeneity
+class: center 
+
+## Hashtag Heterogeneity: *X vs. Y*
+
+.pull-left[
+### Year
+![](figures/monitored_users_2012_AT_activity_160000/mean_hashtags_heterogeneity_rounded.png)
+![](figures/monitored_users_2012_AT_activity_10000/mean_hashtags_heterogeneity_rounded.png)
+
+]
+
+.pull-right[
+### Election Period
+![](figures/monitored_users_2012_AT_activity_election_period_160000/mean_hashtags_heterogeneity_rounded.png)
+![](figures/monitored_users_2012_AT_activity_election_period_10000/mean_hashtags_heterogeneity_rounded.png)
+]
+
+---
+name: interacting-user-heterogeneity
+class: center 
+
+## Interaction Heterogeneity: *X vs. Y*
+
+.pull-left[
+### Year
+![](figures/monitored_users_2012_AT_activity_160000/interactivity_activity.png)
+![](figures/monitored_users_2012_AT_activity_10000/interactivity_activity.png)
+
+]
+
+.pull-right[
+### Election Period
+![](figures/monitored_users_2012_AT_activity_election_period_160000/interactivity_activity.png)
+![](figures/monitored_users_2012_AT_activity_election_period_10000/interactivity_activity.png)
+]
+
+---
+name: activity-correlogram-X
+class: center 
+
+## Activity Correlations: *X*
+
+.pull-left[
+### Year
+![](figures/monitored_users_2012_AT_activity_160000/activity_correlogram.png)
+
+]
+
+.pull-right[
+### Election Period
+![](figures/monitored_users_2012_AT_activity_election_period_160000/activity_correlogram.png)
+
+]
+
+---
+name: activity-correlation-matrix-X
+class: center 
+
+## Activity Correlations: *X*
+
+.pull-left[
+### Year
+![](figures/monitored_users_2012_AT_activity_160000/activity_heatmap.png)
+
+
+]
+
+.pull-right[
+### Election Period
+![](figures/monitored_users_2012_AT_activity_election_period_160000/activity_heatmap.png)
+
+
+]
+
+---
+name: activity-correlogram-Y
+class: center 
+
+## Activity Correlations: *Y*
+
+.pull-left[
+### Year
+![](figures/monitored_users_2012_AT_activity_10000/activity_correlogram.png)
+
+]
+
+.pull-right[
+### Election Period
+![](figures/monitored_users_2012_AT_activity_election_period_10000/activity_correlogram.png)
+
+]
+
+---
+name: activity-correlation-matrix-Y
+class: center 
+
+## Activity Correlations: *Y*
+
+.pull-left[
+### Year
+![](figures/monitored_users_2012_AT_activity_10000/activity_heatmap.png)
+
+
+]
+
+.pull-right[
+### Election Period
+![](figures/monitored_users_2012_AT_activity_election_period_10000/activity_heatmap.png)
+
+
+]
+
+---
+name: CCDF-Y-year
+class: center 
+
+![](figures/monitored_users_2012_AT_activity_10000/2012_10000_year_ccdf.gif)
+
+---
+name: CCDF-Y-election
+class: center 
+
+## Election CCDF: *Y*
+
+![](figures/monitored_users_2012_AT_activity_election_period_10000/ccdfs.png)
+
+---
+name: timespan-users
+class: center 
+
+### Activity Timespan Distributions: *X vs. Y*
+
+
+.pull-left[
+### Year
+
+![](figures/monitored_users_2012_AT_activity_10000/timespan_distribution_users_hist_log.png)
+
+
+]
+
+.pull-right[
+### Election Period
+![](figures/monitored_users_2012_AT_activity_election_period_160000/timespan_distribution_users_hist_log.png)
+
+![](figures/monitored_users_2012_AT_activity_election_period_10000/timespan_distribution_users_hist_log.png)
+
+]
+
+---
+name: timespan-users-Y
+class: center 
+
+### Hashtag Timespan Distributions: *X vs. Y*
+
+
+.pull-left[
+### Year
+![](figures/monitored_users_2012_AT_activity_10000/timespan_distribution_hashtags_hist_log.png)
+
+]
+
+.pull-right[
+### Election Period
+![](figures/monitored_users_2012_AT_activity_election_period_160000/timespan_distribution_hashtags_hist_log.png)
+
+![](figures/monitored_users_2012_AT_activity_election_period_10000/timespan_distribution_hashtags_hist_log.png)
+
+]
+
+
+---
+name: model-architecture
+class: center 
+## Model Architecture
+
+.small[
+#### Ambient Space
+A **multiplex graph** $(V,(E_{\text{follow}}, E_{\text{retweet}}, E_{\text{favorite}}, E_{\text{mention}}))$
+
+.pull-left[
+.left[
+#### Tweet
+* `id` $\in \mathbb{N}$
+* `user_id` $\in \mathbb{N}$
+* `retweet_status` $\in \{T,F\}$
+* `content` $\in \mathbb{R}$
+* ...
+
+#### User
+* `id` $\in \mathbb{N}$
+* `opinion` $\in \mathbb{R}$
+* `activity_rate` $\in \mathbb{R}$
+* ...
+]]
+
+.pull-right[
+.left[
+#### Micro-dynamics
+* `Tweet!`
+* `Update!`: opinion dynamics
+* `Follow!`: social dynamics
+* `Unfollow!`: social dynamics
+* ...
+
+#### Macro-dynamics
+* Centrality metrics
+* Clustering metrics
+* ...
+
+]]
+]
+---
+name: model-simple1
+class: center 
+## Minimal Model
+
+.small[
+.pull-left[
+.left[
+
+#### Tweet Type
+
+* `id` $\in V \subset \mathbb{N}$            
+* `user_id` $\in \mathbb{N}$         
+* `retweet_status` $\in \mathbb{B}$  
+* `retweeted_id` $\in \mathbb{N}$ 
+* `retweeted_user_id` $\in \mathbb{N}$ 
+* `content` $\in \mathbb{R}$ 
+* `favorite_count` $\in \mathbb{N}$
+* `retweet_count` $\in \mathbb{N}$  
+* `step` $\in \mathbb{N}$        
+
+#### User Type
+
+* `id` $\in \mathbb{N}$       
+* `pos` $\in \mathbb{N}$              
+* `feed` $\subset \mathcal{T}$  
+* `tweets` $\subset \mathcal{T}$  
+* `favorites` $\subset \mathcal{T}$
+* `opinion` $\in \mathbb{R}$       
+* `tweet_rate` $\in \mathbb{R}$     
+* `retweet_rate` $\in \mathbb{R}$     
+* `favorite_rate` $\in \mathbb{R}$   
+* `follow_rate` $\in \mathbb{R}$     
+* `unfollow_rate` $\in \mathbb{R}$    
+]
+]
+.pull-right[
+.left[
+
+#### Data 
+* Degree distributions 
+* Activity distributions
+    * Tweet
+    * Favourite 
+    * Follow
+    
+#### Parameters
+
+* Population size $N$
+* Number of replicates $R$
+* Number of time steps $T$
+* Controversialness $\alpha$ 
+* Follow threshold $f$
+* Unfollow threshold $u$
+
+#### Properties 
+
+* Population size `N` 
+* Time step `step` 
+* Tweet ID counter `tweet_id` 
+* Tweet objects `tweets` 
+* Controversialness `α`
+* Follow threshold `follow_threshold`
+* Unfollow threshold `unfollow_threshold`
+]
+]
+]
+
+---
+name: model-simple2
+class: center 
+## Minimal Model
+
+.small[
+.pull-left[
+.left[
+
+#### Initialization 
+
+* `id`: sequentially initialized 
+* `pos`: sequentially initialized 
+* `feed`: initialized as an empty array    
+* `tweets`: initialized as an empty array
+* `favorites`: initialized as an empty array
+* `opinion`: drawn from $\mathcal{U}(-1,1)$          
+* `tweet_rate` and `retweet_rate`: sampled from 2012 activity data 
+* `favorite_rate`: sampled from 2012 activity data 
+* `follow_rate` and `unfollow_rate`: sampled from 2012 activity data 
+* `follower_graph`: friends (outneighbors) of each user (node) have been drawn from a $\Gamma(2,1)$
+
+#### Calibration 
+
+Not discussed yet. 
+
+#### Validation 
+
+Not discussed yet.
+  
+]]
+
+.pull-right[
+.left[
+
+#### Micro-Dynamics 
+
+* Opinion dynamics (`Update!`): governed by the equation in [Baumann et al. (2020)](https://doi.org/10.1103/PhysRevLett.124.048301) 
+* Follow dynamics (`Follow!`): uniform sampling from the complement of set of friends according to `follow_rate` and `follow_threshold` 
+* Unfollow dynamics (`Unfollow!`): uniform sampling from the set of friends according to the user's `unfollow_rate` and `unfollow_threshold` 
+
+#### Macro-Dynamics 
+
+* Time step `step` is incremented by one at each iteration
+* Tweet ID counter `tweet_id` is incremented by one every time a tweet is authored (or retweeted)
+* Tweet objects `tweets` is enriched with every tweet object authored (or retweeted)
+]]
+]
+
+---
+name: model-simple3
+class: center 
+## Minimal Model
+
+.small[
+.pull-left[
+.left[
+
+### Thoughts & Doubts 
+
+* How to define distinct time scales ? $$T_{F} \gg T_{RT} > T_{L}$$ 
+* Choose `nsteps` taking into account the constraints induced by Monitor resolution.
+* Highlight the latency of the opinion variable: users do not have direct access to the *cognitive opinion* of others but they have indirect access to *behavioral opinion* leading to a non-zero probability of misinterpretation (we may model it via probability distributions centered around the true value)
+* Think about how to implement possible polarization/segregation mitigation strategies (e.g. *homophily-induced heterophily*)
+* How to reliably mine temporal behavioral opinion and reaction mechanisms (e.g. net positive interaction rate: net of T,RTs,L of known polarity / total number of interactions) 
+  
+]]
+
+.pull-right[
+.left[
+
+### To-Do List
+
+* Overwrite all graph-related functions in `Agents.jl` to ensure compatibility with `MultiplexGraphs.jl` (e.g. `get_node_agents()`,...)
+* Think about all elementary variables, parameters and timing distributions
+* Explore the portfolio of possible recommendation systems (e.g. GNN, bipartite, centrality-based, simple weighted sum,...)
+* Implement `Read!`, `Tweet!`, `Like!`, `RT!` behaviors
+* Implement the simplest recommendation system (in `model_step!`)
+* Implement non-trivial interpretation distribution $\rho_i$
+* Think of the best parametrization that allows effective calibration 
+]]
+]
+
+---
+name: future
+class: center 
+# Future Developments  
+
+.left[
+
+### Initialization, calibration & validation
+
+* A time step is selected so that it encompasses a statistically significant portion of 2012 data. The distributions extracted from the first temporal slice is used to initialize the model. 
+
+* The rest, except for the last slice, is instead adopted to calibrate the model (parameters such as changes in activity rates)
+
+* The last slice will be used for validation. 
+
+.footnote[
+.left[.small[For further details, please read the [report](https://inphyt.github.io/ABM_MAS/Report/report.html).]]]
+
+]
+
+---
+name: future
+class: center 
+# Future Developments  
+
+.left[
+
+### Recommendation algorithm
+
+* Training and validation of a model able to perform link prediction on the multiplex graph of the ABM from the monitor data.
+
+* Fit the parametric algorithm on the dynamics predicted by the link prediction model on the multiplex graph. 
+
+* Predicted feeds of all users will let us draw a temporal directed **tweet network**, whose nodes are users and edges encode reading relationships. This new network encodes the actual information flow on Twitter, the one where the concept of echo chambers makes sense.
+
+.footnote[
+.left[.small[For further details, please read the [report](https://inphyt.github.io/ABM_MAS/Report/report.html).]]]
+
+]
