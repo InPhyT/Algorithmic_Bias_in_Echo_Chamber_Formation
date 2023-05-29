@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.313">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Algorithmic Bias in Echo Chamber Formation</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="report_files/libs/clipboard/clipboard.min.js"></script>
+<script src="report_files/libs/quarto-html/quarto.js"></script>
+<script src="report_files/libs/quarto-html/popper.min.js"></script>
+<script src="report_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="report_files/libs/quarto-html/anchor.min.js"></script>
+<link href="report_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="report_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="report_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="report_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="report_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="../../../../build/report.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Algorithmic Bias in Echo Chamber Formation</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="goal" class="level1">
+<h1>Goal</h1>
+<p>The research question is to assess algorithmic impact on Twitter echo chamber formation. In order to minimize biases, we observe the same user pool debating over the same topic (US Elections) before and after the introduction of the recommendation algorithm in 2014. Therefore, exploiting a complete dataset of 2012 tweets relative to 2012 U.S. elections, we extract a sample of users to initialize, calibrate and validate an agent based model (ABM) to describe a Twitter free of algorithms. The follow, retweet, favorite, mention (including replies) and hashtag emission of the same pool of users is being monitored in order to get the data needed to later model today’s algorithm-biased Twitter echo chamber dynamics and compare it with what would predict the validated algorithm-free model.</p>
+</section>
+<section id="sec-literature_review" class="level1">
+<h1>Literature Review</h1>
+<p>Twitter can be considered a “media for breaking news in a manner close to omnipresent CCTV for collective intelligence” <span class="citation" data-cites="kwak2010twitter"><a href="#ref-kwak2010twitter" role="doc-biblioref">[1]</a></span> since 2010, and it didn’t but grow in size and information volume since then, being able to count on around 450 million monthly active users today versus around 40 million in 2010. From the beginning, Twitter served as an information sharing platform at least as much as a social network, given its low levels of follow reciprocity and somewhat comparable performance in freshness of “trends” to Google keywords or CNN headlines <span class="citation" data-cites="kwak2010twitter"><a href="#ref-kwak2010twitter" role="doc-biblioref">[1]</a></span>. It would then be useful to characterize information flow on Twitter, and, particularly, what shapes it and in what measure, with particular regard to how Twitter’s recommender systems impact the public debate and the formation of so-called “echo-chambers”.</p>
+<p>In fact, information flow is an essential aspect of modern democracies, and misinformation on social media is a complex yet widespread phenomenon where individual psychological traits, automated bots led by partisan organisations and populist political parties, confirmation bias and limited attention span combine to make it very hard to counter <span class="citation" data-cites="cinelli2019mis"><a href="#ref-cinelli2019mis" role="doc-biblioref">[2]</a></span>. Yet, misinformation automation techniques have been widely exploited, contributing to the diminishment of trust towards public institutions via an inconcluding, polarized, partisan and disinformed debate. Debunking techniques have proven inferior w.r.t. impartial institutional communication in neutralizing these effects <span class="citation" data-cites="cinelli2019mis"><a href="#ref-cinelli2019mis" role="doc-biblioref">[2]</a></span>.</p>
+<p>Moreover, we know that the hierarchy of news presentation is a moral question, a matter of normative importance because of its shaping influence on public attention, and news prioritization has historically been associated with human deliberations, not machine determinations <span class="citation" data-cites="nechushtai2019gatekeepers"><a href="#ref-nechushtai2019gatekeepers" role="doc-biblioref">[3]</a></span>. It is particularly feared that recommender systems may enhance visibility of just an handful of sources while, at the same time, suggesting to users only pieces of information that agree with their view, in order to increase engagement <span class="citation" data-cites="nechushtai2019gatekeepers"><a href="#ref-nechushtai2019gatekeepers" role="doc-biblioref">[3]</a></span>. Although <span class="citation" data-cites="nechushtai2019gatekeepers"><a href="#ref-nechushtai2019gatekeepers" role="doc-biblioref">[3]</a></span> rules out the possibility that the Google News algorithm had a siloing effect on news recommendations (actually the importance of legacy newspapers born before the digital age is preserved by Google news), and that users, regardless of political leaning, were fed with homophilic articles potentially leading to algorithm-induced echo-chambers (see below), similar results have not yet been proven on Twitter.</p>
+<p>The following two sections review the literature about echo-chambers and recommender systems in the context of our work.</p>
+<section id="echo-chambers" class="level2">
+<h2 class="anchored" data-anchor-id="echo-chambers">Echo Chambers</h2>
+<p>An interesting and quite controversial topic about information flow is that of “echo chambers”: intuitively speaking, they are social environments in which the opinion, political leaning, or belief of users about a topic gets reinforced due to repeated interactions with peers or sources having similar tendencies and attitudes <span class="citation" data-cites="Cinelli2021"><a href="#ref-Cinelli2021" role="doc-biblioref">[4]</a></span>. Through confirmation bias, echo chambers may serve as “resonance chambers” where people’s beliefs are reinforced via repeated exposure to like-mined individuals rather than engaging in healthy discussions with users of opposing views. Many studies have tried to address the echo chamber phenomenon on social media.</p>
+<p>From a data analysis point of view, <span class="citation" data-cites="Cinelli2021"><a href="#ref-Cinelli2021" role="doc-biblioref">[4]</a></span> considers four social networks (Twitter, Facebook, Reddit and Gab) and tries to characterize and compare the information flow between their users. The <em>opinion</em> (or <em>ideal point</em>) of user <span class="math inline">\(i\)</span> over a topic is defined as a real number <span class="math inline">\(x_i \in [-1,1]\)</span>, and an operational definition of echo chamber is given, based on the visual features of the correlograms depicting an user’s opinion versus that of its neighbors. Neighborhoods are calculated on “interaction networks” which are constructed with different procedures depending on the social medium in question (Twitter, Reddit and Gab: links to news outlets, Facebook: likes to posts of pages), and the opinion of each user is also estimated in non-comparable ways (Twitter: follower network, Facebook and Gab: co-reply network, Reddit: reply network). Indeed, <span class="citation" data-cites="Cinelli2021"><a href="#ref-Cinelli2021" role="doc-biblioref">[4]</a></span> makes four questionable design choices:</p>
+<ol type="1">
+<li>No explicit definition of echo chamber is used (echo chambers are just “pointed out” as visual features of the correlograms);</li>
+<li>The “interaction network” do not take into account the actual information flow (i.e.&nbsp;they are not a substitute for the actual feed of the users) and could be biased (depending on the case) towards capturing only homophilic or heterophilic interactions;</li>
+<li>Performing a weighted average on tweets containing links to news outlets may be an ineffective way to estimate ideal points: in fact, the content of the tweet could be ironic;</li>
+<li>Opinion estimation and interaction network retrieval is performed in non-comparable ways across the four platforms.</li>
+</ol>
+<p>An intermediate task of this research effort will be to overcome these issues by designing a more robust approach.</p>
+<p>From a probabilistic modeling perspective, <span class="citation" data-cites="barber2015birds"><a href="#ref-barber2015birds" role="doc-biblioref">[5]</a></span> proves that, before taking into account some biases, Twitter’s follower network is a good predictor of ideal points, both of politicians and general population. The author selects a group of US politicians and extracts their Twitter follower network during the 2012 US elections. Then, a simple probabilistic model is developed whose latent parameters include the ideal points of all the politicians and the users extracted. After addressing identifiability issues, the model is calibrated via the use of MCMC algorithms w.r.t. the follower network thus obtaining an estimate for all ideal points, both of politicians and general population. Successive validations and visual comparisons of outputs with existing literature show that the estimate of such ideal points is indeed credible. Finally, the author considers the retweet network over a certain period of time, concerning tweets that either contain the work “Obama” or “Romney”. From the visual segregation of the binned correlogram between the ideal points of users that post the tweets and the users that retweet such tweets, the author infers that Twitter is polarized. Again, we raise similar issues with this article’s approach:</p>
+<ol type="1">
+<li>No explicit definition of echo chamber is used (echo chambers are just “pointed out” as visual features of the correlograms);</li>
+<li>The interaction network considered (the retweet network) is <em>by construction</em> an homophilic network: very few people would retweet a post which they don’t agree with.</li>
+</ol>
+<p>Generally, the phenomena deemed responsible for the formation of echo chambers are <em>Confirmation Bias</em> (i.e.&nbsp;the tendency of each individual to consider only information that is in agreement with own beliefs) and <em>Social Influence</em> (i.e.&nbsp;the degree to which one’s opinion is affected by that of another). Taking a explicit modeling approach, <span class="citation" data-cites="del2017modeling"><a href="#ref-del2017modeling" role="doc-biblioref">[6]</a></span> defines three variations of the Bounded Confidence Model (BCM) <span class="citation" data-cites="Deffuant2000"><a href="#ref-Deffuant2000" role="doc-biblioref">[7]</a></span>, and compares their phase space w.r.t. the asymptotic number of peaks of the opinion distribution. Briefly, the BCM is a model of opinion dynamics where <span class="math inline">\(N\)</span> agents are described by <span class="math inline">\(N\)</span> opinions <span class="math inline">\(x_i \in [-1,1]\)</span> on a binary topic are distributed over a graph of <span class="math inline">\(N\)</span> vertices. Two more parameters <span class="math inline">\(\epsilon\)</span> and <span class="math inline">\(\mu\)</span> (both in <span class="math inline">\([0,1]\)</span>), respectively model Confirmation Bias and Social Influence. At each iteration of the model, every user’s opinion is influenced by that of its neighbors. So considering the i-th user, for every user <span class="math inline">\(j\)</span> within the neighborhood of <span class="math inline">\(i\)</span>, $N_G(i), if <span class="math inline">\(|x_i-x_j| &lt; \epsilon\)</span> we modify the respective opinions according to:</p>
+<p><span id="eq-delvicario_opd"><span class="math display">\[
+\begin{cases}
+x_i = x_i + \mu(x_j-x_i)\\
+x_j = x_j + \mu(x_i-x_j)\\
+\end{cases}
+\tag{1}\]</span></span></p>
+<p>The “Rewire” variants apply a rewiring step before the BCM step described above, where if <span class="math inline">\(|x_i-x_j| &gt; \epsilon\)</span> the link between <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span> is severed and <span class="math inline">\(i\)</span> is randomly rewired to another user. The “Unbounded” variants modify the above system so that “repulsion” is also modelled (the RUCM applies the repulsion step before the rewiring step). We refer the interested reader to <span class="citation" data-cites="del2017modeling"><a href="#ref-del2017modeling" role="doc-biblioref">[6]</a></span> for more information. The key findings of this article are:</p>
+<ol type="1">
+<li>The three new models are able to predict the asymptotic co-existence of two opinions, as opposed to the BCM;</li>
+<li>The three new models are sensitive to <span class="math inline">\(\mu\)</span> in asymptotic number of opinions.</li>
+</ol>
+<p>The opinion dynamic sub-model of the ABM that will be later described will be grid-searched among the aforementioned variants.</p>
+<p>Another approach to explicit modeling is undertaken in <span class="citation" data-cites="baumann2020modeling"><a href="#ref-baumann2020modeling" role="doc-biblioref">[8]</a></span>, where an opinion dynamics model is defined that also models the user activity <span class="math inline">\(a_i\)</span> sampled from a power distribution <span class="math inline">\(~a^{-\gamma}\)</span>, the social influence <span class="math inline">\(K\)</span>, the homophily <span class="math inline">\(\beta\)</span> and the topic controversialness <span class="math inline">\(\alpha\)</span>. Also, differently from <span class="citation" data-cites="del2017modeling"><a href="#ref-del2017modeling" role="doc-biblioref">[6]</a></span>, the interaction dynamics is <span id="eq-baumann_opd"><span class="math display">\[
+\frac{dx_i}{dt} = -x_i + K \sum\limits_{j}^N A_{ij} \tanh(\alpha x_j)
+\tag{2}\]</span></span></p>
+<p>Where <span class="math inline">\(A_{ij}\)</span> is the interaction network (resulting from random activation of user based on their activity and the probability of users <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span> of interacting is <span class="math inline">\(p_{ij} = \frac{|x_i - x_j|^{-\beta}}{\sum_j |x_i - x_j|^{-\beta}}\)</span>). It is to be noted that, differently from most models of <span class="citation" data-cites="del2017modeling"><a href="#ref-del2017modeling" role="doc-biblioref">[6]</a></span>, the latter equation implies a convergence of opinions when two dissenting users interact. The model is shown to replicate the characteristic U-shaped relation between user opinion and activity, and to provide some degree of segregation in correlograms between the opinion of the users and that of their neighborhood. Just as in <span class="citation" data-cites="Cinelli2021"><a href="#ref-Cinelli2021" role="doc-biblioref">[4]</a></span> (that we classified as data analysis paper) and in <span class="citation" data-cites="barber2015birds"><a href="#ref-barber2015birds" role="doc-biblioref">[5]</a></span> (that we characterized as being representative of probabilistic modeling approaches) also this article:</p>
+<ol type="1">
+<li>Does not explicitly define an echo chamber;</li>
+<li>Models an <em>a priori</em> homophilic interaction network;</li>
+<li>The data used estimate ideal points via links to news outlets, just as <span class="citation" data-cites="Cinelli2021"><a href="#ref-Cinelli2021" role="doc-biblioref">[4]</a></span> does;</li>
+</ol>
+<p>In conclusion, all the analyzed papers do not explicitly model echo chambers, measure/define interaction networks in ways that are more ore less explicitly <em>a priori</em> biased towards homophily and use disputable means to perform ideal point/opinion estimation.</p>
+</section>
+<section id="recommender-systems" class="level2">
+<h2 class="anchored" data-anchor-id="recommender-systems">Recommender Systems</h2>
+<p>Recommender systems (or recommendation systems or recommender algorithms) are a subclass of <a href="https://en.wikipedia.org/wiki/Information_filtering_system">information filtering systems</a> that provide suggestions for items that are most pertinent to a particular user (see <a href="https://en.wikipedia.org/wiki/Recommender_system">Wikipedia</a>).</p>
+<p>These are an essential components of modern social media, and in particular of Twitter, as it should be evident from the multiple RecSys challenges that were centered on Twitter (<a href="https://recsys.acm.org/recsys20/challenge/">RecSys2020</a>, <a href="https://recsys.acm.org/recsys21/challenge/">RecSys2021</a>) . Recommender systems come in various formats and with various tasks: <span class="citation" data-cites="kywe2012survey"><a href="#ref-kywe2012survey" role="doc-biblioref">[9]</a></span> develops an early taxonomy of recommender systems on Twitter, explaining how they can be used to suggest followees, followers, hashtags, tweets, retweets and news. Recommender systems are first classified in <em>personalized</em> and <em>non-personalized</em>, and further stratified in being examples of <em>collaborative filtering</em> or being <em>content-based</em>. It is already argued that the most modern recommender systems should probably be endowed with features from both paradigms. For each recommendation task, the authors compile a quick summary of every system invented so far.</p>
+<p><span class="citation" data-cites="perra2019modelling"><a href="#ref-perra2019modelling" role="doc-biblioref">[10]</a></span> studies the effect of simple “tweet” recommender systems on networks with different values of degree heterogeneity, clustering coefficient and small-world features. A pool of user (each occupying a node in such networks) is simulated to have a debate on a binary topic (where opinions may be A or B). At each time step, every user has a probability to activate and perform two operations:</p>
+<ol type="1">
+<li>Broadcast its opinion to its neighbors by posting in their reading lists;</li>
+<li>Update its opinion by reading its timeline (a subset of Q elements the reading list organized by the recommender systems) and acquiring the opinion of the majority of those who posted.</li>
+</ol>
+<p>The investigated networks are:</p>
+<ol type="1">
+<li>Configuration model with power law distribution (heterogeneous degrees, small clustering coefficient, small average path length, briefly named “CM”);</li>
+<li>Watts-Strogatz model with <span class="math inline">\(k = 6\)</span> and <span class="math inline">\(p = 0\)</span> (homogeneous degrees, large clustering coefficient, large average path length, briefly named “WS0”);</li>
+<li>Watts-Strogatz model with <span class="math inline">\(k = 6\)</span> and <span class="math inline">\(p = 0.01\)</span> (homogeneous degrees, large clustering coefficient, small average path length, briefly named “WS001”);</li>
+<li>Watts-Strogatz model with <span class="math inline">\(k = 6\)</span> and <span class="math inline">\(p = 1\)</span> (homogeneous degrees, small clustering coefficient, small average path length, briefly named “WS1”);</li>
+<li>Regular lattice with periodic boundary conditions and <span class="math inline">\(k = 4\)</span> (homogeneous degrees, zero clustering coefficient, large average path length, briefly named “LA”);</li>
+</ol>
+<p>While the investigated recommender systems are:</p>
+<ol type="1">
+<li>Random selection of Q elements of the reading list (“reference method” REF);</li>
+<li>Selection of the first Q elements of the reading list (“recent method” REC);</li>
+<li>Selection of the oldest Q elements of the reading list (“oldest method” OLD);</li>
+<li>Selection of Q elements of the reading list so that all elements that express the same view as the user are picked first (“preference method” PR)</li>
+</ol>
+<p>After simulating the system for 50 steps, and averaging over <span class="math inline">\(\tau = 10\)</span> instantiations of networks that have a stochastic component, it is found that:</p>
+<ol type="1">
+<li>Given a balanced initial opinion distribution where half of the user believe A (<span class="math inline">\(P_A = 0.5\)</span>) and half in B (<span class="math inline">\(P_B = 0.5\)</span>) no algorithm can modify this balance on whatever network. Anyway, on WS0 and WS001 (large clustering coefficient i.e . large topological correlations) the PR method is capable of increasing the fraction of neighborhoods with the majority of user either believing A or B. A similar effect of similar size is not observed on the other networks and/or using other algorithms;</li>
+<li>Given an imbalanced initial opinion distribution where <span class="math inline">\(P_A = 0.2\)</span> and <span class="math inline">\(P_B = 0.8\)</span>, only the PR method is capable of further reducing <span class="math inline">\(P_A\)</span>. On CM and WS1 (small clustering coefficient and small average path length) the PR algorithm reduces the fraction of neighborhoods where the majority of users believe A, in favor of those that believe B, while the remainder of the picture is similar to what is observed in point 1. ;</li>
+<li>If an opinion, say A, is forcefully introduced in the reading lists of users in a capacity that is a fraction <span class="math inline">\(z\)</span> of all posts, the system will converge to all users believing in A, no matter the recommender system and the underlying network. It is observed that time taken to convergence depends on the sorting algorithm and on <span class="math inline">\(z\)</span>, where OLD is found to be the slowest to converge, while high for high values of <span class="math inline">\(z\)</span> the dependence of the time to converge <span class="math inline">\(T^*\)</span> on the recommender system and on <span class="math inline">\(z\)</span> itself becomes weak.</li>
+</ol>
+<p>It should be noted that, again, an explicit definition of echo chambers is not given, as the authors rely on “reader intuition” when looking at specific plots. Nonetheless, a potential influence of recommender algorithms on echo chambers (yet to be defined) cannot be ruled out.</p>
+<p>It can be said that Twitter moved away from a purely chronological timeline (i.e.&nbsp;the set of tweets showed to a user) in 2014 (<a href="https://en.wikipedia.org/wiki/History_of_Twitter">Wikipedia</a>). Unfortunately, little information is available regarding current Twitter’s tweet recommender system, while more information is available about Twitter’s user recommender system in the form of <span class="citation" data-cites="Gupta2013wtf"><a href="#ref-Gupta2013wtf" role="doc-biblioref">[11]</a></span>. The algorithm proposed in <span class="citation" data-cites="Gupta2013wtf"><a href="#ref-Gupta2013wtf" role="doc-biblioref">[11]</a></span> should have been up at least until 2017 <span class="citation" data-cites="nidhi2017twitter"><a href="#ref-nidhi2017twitter" role="doc-biblioref">[12]</a></span> (to the best of our knowledge, since it or part of it may still be active today).</p>
+<p>As <span class="citation" data-cites="Belli2020PrivacyPreservingRS"><a href="#ref-Belli2020PrivacyPreservingRS" role="doc-biblioref">[13]</a></span> notes, little effort has been produced to construct and test new tweet recommender systems, and we add that even less research is so far concerned with learning as many features as possible of the existing Twitter’s tweet recommender system, although the need for such inquiries is known since a few years <span class="citation" data-cites="nechushtai2019gatekeepers"><a href="#ref-nechushtai2019gatekeepers" role="doc-biblioref">[3]</a></span>. Particularly, no one has ever tried to quantify the impact of Twitter’s suite of recommender systems onto echo chambers dynamics. In this work, we aim to fill this gap by introducing an agent based model (ABM) on Twitter’s multilayer graph, upon which a parametric algorithm will act. Each agent will represent a user (in a pool of around <span class="math inline">\(10^4\)</span>) that took part in both the debate about 2012 US presidential elections and 2020 US presidential elections. Intuitively, we aim to fit the ABM using data from a period where no algorithm was present (2012), and then, keeping the ABM’s parameters fixed, we will fit a parametric recommender system upon the ABM w.r.t. a period where Twitter’s algorithms were present (2020). Finally, differences in echo chamber dynamics wil be assessed.</p>
+<p>The ABM’s purpose is to model the (collective) social behaviour (follow, retweet, like, mention, tweet) and opinion dynamics about 2012 and 2020 US presidential election of a group of user in such a way that algorithmic influences are filtered out. To this end, we downloaded as many tweets as possible from 2012 and the retweet and mention networks (which are temporal networks) from those 10’000 users dating back to 2012 (when no sophisticated algorithm was present), and intend to use these data to fit and validate the ABM. Later, we downloaded the retweet and mention networks from those 10’000 users dating back to 2020 (when more sophisticated algorithms were present, for a period that includes the presidential debates and elections), and this time we also extracted temporal information about follow and like activity (which is not possible when using historical API). Knowing the whole temporal activity during the elections will enable us to fit a parametric recommender system by imposing the measured 2020 activity onto the ABM (with the user parameters as calibrated from 2012) and calibrating the parameters of the parametric algorithm that best match the two.</p>
+<p>By giving an an explicit definition of echo chamber, based on thresholding some clustering metrics on the multi-layer graph together with a measure of the statistical properties of the ideal points within those clusters, we are able to assess whether Twitter’s suite of recommender systems may indeed have a measurable effect on echo chamber dynamics.</p>
+<p>In the remainder, we will further detail the experimental setup, the data collected and the developed software.</p>
+</section>
+</section>
+<section id="data-and-data-wrangling" class="level1">
+<h1>Data and Data Wrangling</h1>
+<p>The data retrieval and processing is outlined below, starting with 2012 data and then presenting 2020 data. Both sets of data begin with the first presidential debate and end with the last one.</p>
+<section id="sec-2012_data" class="level3">
+<h3 class="anchored" data-anchor-id="sec-2012_data">2012 Data</h3>
+<ol type="1">
+<li>We downloaded all tweets from the two sources:</li>
+</ol>
+<ul>
+<li>“Twitter Stream Grab” from ArchiveTeam 2012 (<a href="https://archive.org/details/twitterstream?&amp;and%5B%5D=year%3A%222012%22">link</a>);</li>
+<li>Microsoft’s 38M tweets dating back to specifically the 2012 election (<a href="https://www.microsoft.com/en-us/download/details.aspx?id=52598">link</a>), from July 1, 2012 through November 7, 2012.</li>
+</ul>
+<p>Please note that the “Twitter Stream Grab” accounts for roughly one one-hundredth of all tweets produced in 2012 <span class="citation" data-cites="kergl2014"><a href="#ref-kergl2014" role="doc-biblioref">[14]</a></span>, while Microsoft’s data comprises al tweets that include the hashtags “Romney” or “Obama” produced between August 1, 2012 and November 6, 2012, inclusively <span class="citation" data-cites="Diaz2016"><a href="#ref-Diaz2016" role="doc-biblioref">[15]</a></span>.</p>
+<ol type="1">
+<li><p>From those tweets, we extracted the hashtags that were relevant to the 2012 elections: we started by selecting al tweets containing at least one of the hashtags “election2012”,“vote”,“voteblue”,“votered”,“obama” and “romney”. Then considered all the hashtags that were presents in those tweets. From this set, we only kept the hashtags that contained the tokens “democrat”,“republican”,“obama”,“romney”,“votered” and “voteblue”. The initial hashtags and tokens were selected by taking two general hashtags, two specific hashtags and two polarized hashtags. We repeated the process another time and saved all relevant hashtags.</p></li>
+<li><p>We then proceeded to select only those tweets and users that:</p>
+<ul>
+<li>Used at least one relevant hashtag in 2012;</li>
+<li>Still existed throughout 2020;</li>
+</ul></li>
+</ol>
+<p>We obtained roughly 160’000 users. From these, we only kept the ones that had at least interacted once (retweet or mention) with another user from the same set. This led to retaining around 10’000 users.</p>
+<ol start="4" type="1">
+<li>We further expanded the set of tweets produced by the 10’000 users by implementing the methodology in <span class="citation" data-cites="kergl2014"><a href="#ref-kergl2014" role="doc-biblioref">[14]</a></span>, retrieving a few more million tweets from those 10’000 users specifically produced during the election period. The number of tweets retrieved with this method might seem large, but it is expected since these users are the ones that not only participated to the debate but also stayed around for longer and are thus more invested and active.</li>
+<li>All the hashtags retrieved in point 1. (around 4000) were manually labelled as +1 (republican) or -1 (democrat) by reading the tweets they were used in and decide upon their average leaning.</li>
+</ol>
+<p>The last step allows us to initialize the modelled users’ opinions.</p>
+</section>
+<section id="data" class="level3">
+<h3 class="anchored" data-anchor-id="data">2020 Data</h3>
+<p>The follower, retweet, favorite and mention networks were downloaded before the first presidential debate. During the considered period, we ran a sophisticated multithreaded algorithm capable of monitoring all activity of those 10’000 users every 15 minutes. The algorithm made exclusively use of the official Twitter API. Thus, we have a temporal follower, retweet, mention and favorite network spanning the whole period.</p>
+</section>
+</section>
+<section id="methods" class="level1">
+<h1>Methods</h1>
+<p>We aim to measure (if any) the effects of Twitter’s suite of black box recommender systems on echo chamber dynamics. To this end, we need to model separately the activity the 10’000 users would perform in absence of any sophisticated algorithm and the sophisticated algorithm (suite) itself, so that later we may compare the activity of the group of user with and without the influence of the modelled algorithm and measure the differences in echo chamber dynamics.</p>
+<p>The activity of the 10’000 users will be modelled via an ABM, implemented in Agents.jl <span class="citation" data-cites="vahdati2019agents"><a href="#ref-vahdati2019agents" role="doc-biblioref">[16]</a></span> . We chose to model and measure the same users both in 2012 and 2020 in order to minimize biases due to user selection. The ABM’s base space will be Twitter’s multilayer graph, implemented using MultilayerGraphs.j1 <span class="citation" data-cites="Moroni2023"><a href="#ref-Moroni2023" role="doc-biblioref">[17]</a></span>. Parametric algorithms will be taken from literature.</p>
+<section id="echo-chamber-definition" class="level2">
+<h2 class="anchored" data-anchor-id="echo-chamber-definition">Echo Chamber Definition</h2>
+<p>As it is outlined in the <a href="#sec-literature_review">Section&nbsp;2</a>, no explicit definition of “echo-chamber” has been given so far. We propose the following:</p>
+<p><span class="math inline">\(\underline{\textbf{Def}}\)</span>: Consider a graph <span class="math inline">\(G\)</span>, a measure of node attribute homogeneity <span class="math inline">\(\xi : 2^G \rightarrow \mathbb{R}\)</span>, a clustering algorithm <span class="math inline">\(C\)</span> and a real number <span class="math inline">\(p\)</span> in the target of <span class="math inline">\(C\)</span>. We define a <span class="math inline">\((C,p)\)</span>-echo chamber as a subgraph <span class="math inline">\(H \subseteq G\)</span> such that:</p>
+<ol type="1">
+<li><span class="math inline">\(H\)</span> is s <span class="math inline">\(C\)</span>-cluster;</li>
+<li><span class="math inline">\(\xi(H) \geq p\)</span></li>
+</ol>
+<p>In short, this definition combines the notion of topological clustering with that of opinion homogeneity. Results will be tested for robustness w.r.t. <span class="math inline">\(C\)</span> and <span class="math inline">\(p\)</span>.</p>
+<p>The features of the simultaneous evolution of the two variables (i.e.&nbsp;<span class="math inline">\(\xi(H)\)</span> and the loss associated to <span class="math inline">\(C\)</span>), and/or an aggregation of them, will be the main quantities of interest for this inquiry.</p>
+</section>
+<section id="agent-based-model" class="level2">
+<h2 class="anchored" data-anchor-id="agent-based-model">Agent Based Model</h2>
+<section id="base-space-and-dynamics" class="level3">
+<h3 class="anchored" data-anchor-id="base-space-and-dynamics">Base Space and Dynamics</h3>
+<p>The agent based model has been implemented using Agents.jl <span class="citation" data-cites="vahdati2019agents"><a href="#ref-vahdati2019agents" role="doc-biblioref">[16]</a></span>, a pure Julia framework for agent-based modeling. Being part of the <a href="https://juliadynamics.github.io/JuliaDynamics/">JuliaDynamics</a> ecosystem, Agents.jl was designed with performance, scalability and ease of use in mind. The model aims to incorporate all the essential features of the Twitter community when not influenced by recommender algorithms, while remaining as simple as possible. In order to incorporate all kinds of interactions, the base space of the ABM is a multilayer graph (<span class="citation" data-cites="DeDomenico2013"><a href="#ref-DeDomenico2013" role="doc-biblioref">[18]</a></span>, <span class="citation" data-cites="kivela2014"><a href="#ref-kivela2014" role="doc-biblioref">[19]</a></span>) implemented using MultilayerGraphs.jl <span class="citation" data-cites="Moroni2023"><a href="#ref-Moroni2023" role="doc-biblioref">[17]</a></span> . The latter is a library that bridges the JuliaDynamics and <a href="https://juliagraphs.org/">JuliaGraphs</a> ecosystems, thus enabling agent based modelling on (general) multilayer graphs. The effectiveness of the integration is proved in a dedicated script of the test suite. Each node of the multilayer graph represents an user out of the 10’000. The layers are the follow, retweet and like networks. Every user is represented in each layer, and interlayers are diagonal, making it the perfect use case for a <code>SynchroinizedEdgeColoredDiGraph</code>. Users update their opinion via a Bounded Confidence Model based on <span class="citation" data-cites="del2017modeling"><a href="#ref-del2017modeling" role="doc-biblioref">[6]</a></span>. Static variables shared by all users are:</p>
+<ul>
+<li><span class="math inline">\(\epsilon\)</span>: the “confirmation bias” parameter, that regulates whether an interaction between two users has a (potentially) reinforcing or (potentially) weakening effect on the edges between them (see below for details). It is a real number in <span class="math inline">\([0,1]\)</span>, although different choices of <span class="math inline">\(\epsilon\)</span> may be explored <span class="citation" data-cites="del2017modeling"><a href="#ref-del2017modeling" role="doc-biblioref">[6]</a></span>;</li>
+<li><span class="math inline">\(\mu\)</span>: the “social influence” parameter, which quantifies the effect of an user’s opinion on another one’s <span class="citation" data-cites="del2017modeling"><a href="#ref-del2017modeling" role="doc-biblioref">[6]</a></span> .</li>
+</ul>
+<p>The <span class="math inline">\(i^{\text{th}}\)</span> user has the following fields:</p>
+<ul>
+<li><span class="math inline">\(id\)</span>: unique integer identifier;</li>
+<li><span class="math inline">\(pos_i\)</span>: the id of the node where the agent sits;</li>
+<li><code>feed</code>: the ordered selection of tweets presented to the user by the suite of recommender systems. It is updated at each time step;</li>
+<li><span class="math inline">\(a_i\)</span>: the activity of the user i.e.&nbsp;its probability to be activates at each time step;</li>
+<li><span class="math inline">\(x_i\)</span>: the time-varying opinion of the agent, a real number between <span class="math inline">\(-1\)</span> (democrat) and <span class="math inline">\(+1\)</span> (republican).</li>
+<li><span class="math inline">\(Tw_i\)</span>: the probability that a user will tweet its opinion if activated;</li>
+<li><span class="math inline">\(Rt_i\)</span>: the probability that a user will retweet a tweet in its feed if activated and if its opinion is within <span class="math inline">\(\epsilon\)</span> from hers/his;</li>
+<li><span class="math inline">\(Fv_i\)</span>: the probability that a user will like a tweet in its feed if activated and if its opinion is within <span class="math inline">\(\epsilon\)</span> from hers/his;</li>
+<li><span class="math inline">\(Fl_i\)</span>:the probability that an activated user will follow a user whose tweet is in her/his feed and if its opinion is within <span class="math inline">\(\epsilon\)</span> from hers/his;</li>
+<li><span class="math inline">\(Uf_i\)</span>: the probability that an activated user will unfollow a user whose tweet is in her/his feed if its opinion is further than <span class="math inline">\(\epsilon\)</span> from hers/his;</li>
+</ul>
+<p>A tweet <span class="math inline">\(T\)</span> has the following properties:</p>
+<ul>
+<li><code>id</code>: an unique integer identifier;</li>
+<li><code>user_id</code>: the <code>i</code> field of the user who tweeted this tweet;</li>
+<li><code>retweeted_tweet</code>: the tweet this tweet retweets. If this tweet os not a retweet, this field will be blank;</li>
+<li><code>content</code>: the opinion expressed in this tweet (thus it is a real number within <span class="math inline">\([-1,1]\)</span>). Same as <code>T.retweeted_tweet.content</code> if it is a retweet;</li>
+<li><code>favorite_count</code>: the number of likes this tweet received;</li>
+<li><code>retweet_count</code>: the number of retweets this tweet received.</li>
+</ul>
+<p>Time is discrete. At each time step <span class="math inline">\(t_i\)</span>, each user <span class="math inline">\(x\)</span> has a probability to activate given by <span class="math inline">\(a_x\)</span> . If activated, for each tweet <span class="math inline">\(T\)</span> in its feed, the user decides whether the tweet agrees with her/his opinion by evaluating the condition <span class="math inline">\(|x.opinion - T.content| &lt; \epsilon\)</span> <span class="citation" data-cites="del2017modeling"><a href="#ref-del2017modeling" role="doc-biblioref">[6]</a></span>, and if so, the user updates its opinion according to <a href="#eq-delvicario_opd">Equation&nbsp;1</a>, decides whether or not to retweet (with probability <span class="math inline">\(Rt_x\)</span>), whether or not to like (with like <span class="math inline">\(Fv_x\)</span>) and whether or not to follow the user who wrote it (with probability <span class="math inline">\(Fl_x\)</span>). If instead the condition is not satisfied, the user decides whether or not to unfollow the user who wrote it (with probability <span class="math inline">\(Uf_x\)</span>). All users’ update opinion is simultaneous, meaning that users at time <span class="math inline">\(t_i\)</span> update their opinion based solely on tweets produced at times <span class="math inline">\(t &lt; t_i\)</span>. This choice enforces consistency and allows for more freedom in the choice of the internal Agent.jl’s scheduler, unlocking even faster performance.</p>
+<p>To assess modeling impact on results, we will repeat the simulations substituting <a href="#eq-delvicario_opd">Equation&nbsp;1</a> with <a href="#eq-baumann_opd">Equation&nbsp;2</a> , and deciding on whether a tweet’s opinion agrees with that of the user who reads it by judging the concordance of the signs of the user’s opinion and the derivative calculated via <a href="#eq-baumann_opd">Equation&nbsp;2</a> . In this case the static <span class="math inline">\(\epsilon\)</span> parameter would be substituted by the controversialness <span class="math inline">\(\alpha\)</span> as modelled in <span class="citation" data-cites="baumann2020modeling"><a href="#ref-baumann2020modeling" role="doc-biblioref">[8]</a></span> .</p>
+<p>At this stage, the user <span class="math inline">\(x\)</span>’s feed only contains tweets and retweets from its neighbors, and they are shown according to reversed chronological order. So the “recommender system” is simple and topological.</p>
+</section>
+</section>
+<section id="model-initialization" class="level2">
+<h2 class="anchored" data-anchor-id="model-initialization">Model Initialization</h2>
+<p>The following sections provide some possible initialization strategies that could benefit calibration. Since the latter should be performed w.r.t. aggregate metrics (to be determined), a perfect initialization is not needed thus the following techniques will be applied in the measure deemed necessary.</p>
+<section id="model-initialization-1" class="level3">
+<h3 class="anchored" data-anchor-id="model-initialization-1">2012 Model Initialization</h3>
+<p>The following model fields and parameters need to be initialized for the 2012 model:</p>
+<ul>
+<li>Follower network;</li>
+<li>Users’ activity, tweet rate, retweet rate, favorite rate, follow rate and unfollow rate distributions;</li>
+<li>Users’ opinions.</li>
+</ul>
+<p>The 2012 data do not provide timestamped follower networks. These will be initialized according to three strategies:</p>
+<ul>
+<li>Random initialization using a directed configuration model (power-law from literature);</li>
+<li>Random initialization using correlations between follow and retweet activity over large user samples and/or derived from literature.</li>
+<li>Initialization using the retweet network up to a certain point in time (to be determined);</li>
+</ul>
+<p>Results’ robustness will be checked by performing a sensitivity analysis.</p>
+<p>The retweet network will be initialized using the collected 2012 data. Users’ activity distribution will be modelled according to a power law <span class="citation" data-cites="baumann2020modeling"><a href="#ref-baumann2020modeling" role="doc-biblioref">[8]</a></span>, while tweet, retweet, favorite, follow and unfollow rates will be extracted from a distribution to be looked for in the literature or from the data if they’re found to be representative (i.e.&nbsp;we extracted a significant proportion of all tweet using the methodology taken from <span class="citation" data-cites="kergl2014"><a href="#ref-kergl2014" role="doc-biblioref">[14]</a></span>).</p>
+<p>2012 users’ opinions have been calculated by averaging the opinions expressed in their tweets. Each tweet has been given an opinion by averaging the leanings associated to each of its hashtags (see <a href="#sec-2012_data">Section&nbsp;3.0.1</a>).</p>
+</section>
+<section id="model-initialization-2" class="level3">
+<h3 class="anchored" data-anchor-id="model-initialization-2">2020 Model Initialization</h3>
+<p>The following model fields and parameters need to be initialized for the 2020 model:</p>
+<ul>
+<li>Follower network;</li>
+<li>Retweet network;</li>
+<li>Favorite network;</li>
+<li>Users’s opinions.</li>
+</ul>
+<p>For the 2020 US presidential elections we have downloaded the temporal follow, retweet, mention and favorite activity together with their initial conditions (before the first presidential debate took place), thus we are able to perfectly initialize all networks before calibrating the recommender system. Users’ opinions will be initialized with a procedure analogous to that of 2012 (hashtag selection followed by manual hashtag classification).</p>
+</section>
+</section>
+</section>
+<section id="limitations" class="level1">
+<h1>Limitations</h1>
+<p>The above formulation assumes that the change in users’ activity rates from 2012 to 2020 is totally due to the recommender system suite. This may cause undetectable identifiability issues to be measured and addressed in future works. Anyway, since the scope of this effort is to evaluate aggregate quantities (i.e.&nbsp;the differences of the time evolution of <span class="math inline">\((C,p)\)</span>-echo chamber metrics over time), rather than investigating latent variables of the ABM or the parametric recommender system, this issue shouldn’t diminish the value of the results.</p>
+</section>
+<section id="references" class="level1 unnumbered">
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body" role="list">
+<div id="ref-kwak2010twitter" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[1] </div><div class="csl-right-inline">H. Kwak, C. Lee, H. Park, and S. Moon, <span>“What is twitter, a social network or a news media?”</span> in <em>Proceedings of the 19th international conference on world wide web - <span>WWW</span> <span></span>10</em>, 2010. doi: <a href="https://doi.org/10.1145/1772690.1772751">10.1145/1772690.1772751</a>.</div>
+</div>
+<div id="ref-cinelli2019mis" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[2] </div><div class="csl-right-inline">M. Cinelli <em>et al.</em>, <span>“(Mis) information operations: An integrated perspective,”</span> <em>arXiv preprint arXiv:1912.10795</em>, 2019, Available: <a href="https://arxiv.org/pdf/1912.10795">https://arxiv.org/pdf/1912.10795</a></div>
+</div>
+<div id="ref-nechushtai2019gatekeepers" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[3] </div><div class="csl-right-inline">E. Nechushtai and S. C. Lewis, <span>“What kind of news gatekeepers do we want machines to be? Filter bubbles, fragmentation, and the normative dimensions of algorithmic recommendations,”</span> <em>Computers in Human Behavior</em>, vol. 90, pp. 298–307, Jan. 2019, doi: <a href="https://doi.org/10.1016/j.chb.2018.07.043">10.1016/j.chb.2018.07.043</a>.</div>
+</div>
+<div id="ref-Cinelli2021" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[4] </div><div class="csl-right-inline">M. Cinelli, G. D. F. Morales, A. Galeazzi, W. Quattrociocchi, and M. Starnini, <span>“The echo chamber effect on social media,”</span> <em>Proceedings of the National Academy of Sciences</em>, vol. 118, no. 9, Feb. 2021, doi: <a href="https://doi.org/10.1073/pnas.2023301118">10.1073/pnas.2023301118</a>.</div>
+</div>
+<div id="ref-barber2015birds" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[5] </div><div class="csl-right-inline">P. Barberá, <span>“Birds of the same feather tweet together: Bayesian ideal point estimation using twitter data,”</span> <em>Political Analysis</em>, vol. 23, no. 1, pp. 76–91, 2015, doi: <a href="https://doi.org/10.1093/pan/mpu011">10.1093/pan/mpu011</a>.</div>
+</div>
+<div id="ref-del2017modeling" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[6] </div><div class="csl-right-inline">M. D. Vicario, A. Scala, G. Caldarelli, H. E. Stanley, and W. Quattrociocchi, <span>“Modeling confirmation bias and polarization,”</span> <em>Scientific Reports</em>, vol. 7, no. 1, Jan. 2017, doi: <a href="https://doi.org/10.1038/srep40391">10.1038/srep40391</a>.</div>
+</div>
+<div id="ref-Deffuant2000" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[7] </div><div class="csl-right-inline">G. Deffuant, D. Neau, F. Amblard, and G. Weisbuch, <span>“Mixing beliefs among interacting agents,”</span> <em>Advances in Complex Systems</em>, vol. 3, no. 01n04, pp. 87–98, Jan. 2000, doi: <a href="https://doi.org/10.1142/s0219525900000078">10.1142/s0219525900000078</a>.</div>
+</div>
+<div id="ref-baumann2020modeling" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[8] </div><div class="csl-right-inline">F. Baumann, P. Lorenz-Spreen, I. M. Sokolov, and M. Starnini, <span>“Modeling echo chambers and polarization dynamics in social networks,”</span> <em>Physical Review Letters</em>, vol. 124, no. 4, Jan. 2020, doi: <a href="https://doi.org/10.1103/physrevlett.124.048301">10.1103/physrevlett.124.048301</a>.</div>
+</div>
+<div id="ref-kywe2012survey" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[9] </div><div class="csl-right-inline">S. M. Kywe, E.-P. Lim, and F. Zhu, <span>“A survey of recommender systems in twitter,”</span> in <em>Lecture notes in computer science</em>, Springer Berlin Heidelberg, 2012, pp. 420–433. doi: <a href="https://doi.org/10.1007/978-3-642-35386-4_31">10.1007/978-3-642-35386-4_31</a>.</div>
+</div>
+<div id="ref-perra2019modelling" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[10] </div><div class="csl-right-inline">N. Perra and L. E. C. Rocha, <span>“Modelling opinion dynamics in the age of algorithmic personalisation,”</span> <em>Scientific Reports</em>, vol. 9, no. 1, May 2019, doi: <a href="https://doi.org/10.1038/s41598-019-43830-2">10.1038/s41598-019-43830-2</a>.</div>
+</div>
+<div id="ref-Gupta2013wtf" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[11] </div><div class="csl-right-inline">P. Gupta, A. Goel, J. Lin, A. Sharma, D. Wang, and R. Zadeh, <span>“<span>WTF</span>,”</span> in <em>Proceedings of the 22nd international conference on world wide web - <span>WWW</span> <span></span>13</em>, 2013. doi: <a href="https://doi.org/10.1145/2488388.2488433">10.1145/2488388.2488433</a>.</div>
+</div>
+<div id="ref-nidhi2017twitter" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[12] </div><div class="csl-right-inline">R. H. Nidhi and B. Annappa, <span>“Twitter-user recommender system using tweets: A content-based approach,”</span> in <em>2017 international conference on computational intelligence in data science(<span>ICCIDS</span>)</em>, Jun. 2017. doi: <a href="https://doi.org/10.1109/iccids.2017.8272631">10.1109/iccids.2017.8272631</a>.</div>
+</div>
+<div id="ref-Belli2020PrivacyPreservingRS" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[13] </div><div class="csl-right-inline">L. Belli <em>et al.</em>, <span>“Privacy-preserving recommender systems challenge on twitter’s home timeline,”</span> <em>ArXiv</em>, vol. abs/2004.13715, 2020.</div>
+</div>
+<div id="ref-kergl2014" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[14] </div><div class="csl-right-inline">D. Kergl, R. Roedler, and S. Seeber, <span>“On the endogenesis of twitter’s spritzer and gardenhose sample streams,”</span> in <em>2014 IEEE/ACM international conference on advances in social networks analysis and mining (ASONAM 2014)</em>, 2014, pp. 357–364. doi: <a href="https://doi.org/10.1109/ASONAM.2014.6921610">10.1109/ASONAM.2014.6921610</a>.</div>
+</div>
+<div id="ref-Diaz2016" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[15] </div><div class="csl-right-inline">F. Diaz, M. Gamon, J. M. Hofman, E. Kıcıman, and D. Rothschild, <span>“Online and social media data as an imperfect continuous panel survey,”</span> <em><span>PLOS</span> <span>ONE</span></em>, vol. 11, no. 1, p. e0145406, Jan. 2016, doi: <a href="https://doi.org/10.1371/journal.pone.0145406">10.1371/journal.pone.0145406</a>.</div>
+</div>
+<div id="ref-vahdati2019agents" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[16] </div><div class="csl-right-inline">A. Vahdati, <span>“Agents.jl: Agent-based modeling framework in julia,”</span> <em>Journal of Open Source Software</em>, vol. 4, no. 42, p. 1611, Oct. 2019, doi: <a href="https://doi.org/10.21105/joss.01611">10.21105/joss.01611</a>.</div>
+</div>
+<div id="ref-Moroni2023" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[17] </div><div class="csl-right-inline">C. Moroni and P. Monticone, <span>“<span>MultilayerGraphs</span>.jl: Multilayer network science in julia,”</span> <em>Journal of Open Source Software</em>, vol. 8, no. 83, p. 5116, Mar. 2023, doi: <a href="https://doi.org/10.21105/joss.05116">10.21105/joss.05116</a>.</div>
+</div>
+<div id="ref-DeDomenico2013" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[18] </div><div class="csl-right-inline">M. De Domenico <em>et al.</em>, <span>“Mathematical formulation of multilayer networks,”</span> <em>Phys. Rev. X</em>, vol. 3, p. 041022, Dec. 2013, doi: <a href="https://doi.org/10.1103/PhysRevX.3.041022">10.1103/PhysRevX.3.041022</a>.</div>
+</div>
+<div id="ref-kivela2014" class="csl-entry" role="listitem">
+<div class="csl-left-margin">[19] </div><div class="csl-right-inline">M. Kivelä, A. Arenas, M. Barthelemy, J. P. Gleeson, Y. Moreno, and M. A. Porter, <span>“<span class="nocase">Multilayer networks</span>,”</span> <em>Journal of Complex Networks</em>, vol. 2, no. 3, pp. 203–271, Jul. 2014, doi: <a href="https://doi.org/10.1093/comnet/cnu016">10.1093/comnet/cnu016</a>.</div>
+</div>
+</div></section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
