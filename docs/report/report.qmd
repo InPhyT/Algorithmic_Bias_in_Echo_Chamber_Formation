@@ -1,6 +1,6 @@
 ---
 title: "Algorithmic Bias in Echo Chamber Formation"
-author: "Claudio Moroni"
+#author: "Claudio Moroni"
 format: 
   pdf: 
     toc: true # Generate table of contents
@@ -12,7 +12,7 @@ format:
         \usepackage{blindtext}
         \usepackage{amsmath}
 
-bibliography: bibliography.bib
+bibliography: references.bib
 csl: ieee.csl
 
 latex-output-dir: build
