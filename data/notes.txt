@@ -1,3 +1,0 @@
-first array is status mean activity
-second array is favorite mean activity
-third array is follow mean activity
