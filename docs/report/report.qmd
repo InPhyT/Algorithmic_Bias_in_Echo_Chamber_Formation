@@ -1,6 +1,6 @@
 ---
 title: "Algorithmic Bias in Echo Chamber Formation"
-#author: "Claudio Moroni"
+author: "Claudio Moroni and Pietro Monticone"
 format: 
   pdf: 
     toc: true # Generate table of contents
