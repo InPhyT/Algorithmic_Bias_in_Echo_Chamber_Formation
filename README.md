@@ -16,7 +16,7 @@
 [![DOI](https://zenodo.org/badge/643664878.svg)](https://zenodo.org/badge/latestdoi/643664878)
 
 ## Goal
-The research question is to assess algorithmic impact on Twitter echo chamber formation. In order to minimize biases, we observe the same user pool debating over the same topic (US Elections) before and after the introduction of the recommendation algorithm in 2014. Therefore, exploiting a complete dataset of 2012 tweets relative to 2012 U.S. elections, we extract a sample of users  to initialize, calibrate and validate an ABM to describe an free Twitter. The follow, retweet, favorite, mention (including replies) and hashtag  emission of the same pool of users is being monitored in order to get the data needed to later model today's algorithm-biased Twitter echo chamber dynamics and compare it with what would predict the validated algorithm-free model. So we organized the work so far as follows. 
+The research question is to assess algorithmic impact on Twitter echo chamber formation. In order to minimize biases, we observe the same user pool debating over the same topic (US Elections) before and after the introduction of the recommendation algorithm in 2014. Therefore, exploiting a complete dataset of 2012 tweets relative to 2012 U.S. elections, we extract a sample of users  to initialize, calibrate and validate an ABM to describe a free Twitter. The follow, retweet, favorite, mention (including replies) and hashtag  activity of the same pool of users is being monitored in order to get the data needed to later model today's algorithm-biased Twitter echo chamber dynamics and compare it with what would predict the validated algorithm-free model. So we organized the work so far as follows. 
 
 ## Definitions
 
